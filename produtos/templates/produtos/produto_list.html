@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+    Lista de Produtos
+{% endblock page_title %}
+
+{% block content %}
+        <h2>Produtos</h2>
+        {% if produto_list %}
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Titulo</th>
+                    <th scope="col">Descrição</th>
+                    <th scope="col">Criado em:</th>
+                    <th scope="col">Desativado em:</th>                    
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for produto in produto_list  %}
+                        <tr>
+                            <th scope="row">{{produto.pk }}</th>
+                            <td>{{ produto.title }}</td>
+                            <td>{{ produto.description }}</td>   
+                            <td>{{ produto.created_at }}</td>
+                            <td>{{ produto.finished_at|default:"-"}}</td>
+                            <td>
+                               <a href="{% url 'produto_detail' pk=produto.pk %}" class="btn btn-info">Detalhes</a>
+                              
+                            </td>
+                        </tr>
+                    {% endfor %}            
+                </tbody>
+            </table>
+        {% else %} 
+            <p>No tasks</p>
+        {% endif %}
+
+        <!-- Controles de Paginação -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if produto_list.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ produto_list.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% for num in produto_list.paginator.page_range %}
+                    {% if produto_list.number == num %}
+                        <li class="page-item active">
+                            <a class="page-link">{{ num }}</a>
+                        </li>
+                    {% elif num > produto_list.number|add:'-3' and num < produto_list.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if produto_list.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ produto_list.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ produto_list.paginator.num_pages }}" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+
+    <a href="{% url 'produto_create' %}" class="btn btn-primary">Novo Produto</a>
+{% endblock content %}
